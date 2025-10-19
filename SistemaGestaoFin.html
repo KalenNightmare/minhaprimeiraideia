@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Protótipos — Sistema de Gestão Financeira</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--muted:#6b7280;--accent:#0ea5a4;--danger:#ef4444;--glass:rgba(2,6,23,0.04);--radius:12px}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial;background:linear-gradient(180deg,#f7fbfd 0%, #f0f4f8 100%);color:#0f1724}
+    .app{max-width:1200px;margin:20px auto;padding:18px}
+
+    /* Topbar */
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;color:white;font-weight:700}
+    h1{font-size:18px;margin:0}
+    .lead{color:var(--muted);font-size:13px}
+
+    /* Layout */
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:18px}
+    @media (max-width:900px){.layout{grid-template-columns:1fr}}
+
+    /* Sidebar */
+    .sidebar{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .nav{display:flex;flex-direction:column;gap:6px}
+    .nav button{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:0;background:transparent;cursor:pointer;color:#0f1724;text-align:left}
+    .nav button.active{background:linear-gradient(90deg, rgba(14,165,164,0.12), rgba(124,58,237,0.06));font-weight:600}
+    .nav small{display:block;color:var(--muted);margin-top:6px}
+
+    /* Content area */
+    .content{min-height:520px}
+    .screen{display:none;background:var(--card);padding:18px;border-radius:var(--radius);box-shadow:0 10px 30px rgba(15,23,42,0.06)}
+    .screen.active{display:block}
+
+    /* Dashboard */
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:14px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg,#ffffff,#fbfeff);padding:14px;border-radius:12px;border:1px solid var(--glass)}
+    .kpi{display:flex;gap:12px;flex-wrap:wrap}
+    .kpi .item{flex:1;min-width:140px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#fbffff,#ffffff);box-shadow:0 6px 18px rgba(2,6,23,0.03)}
+    .kpi h3{margin:0;font-size:14px}
+    .kpi p{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+    /* Transactions list */
+    table{width:100%;border-collapse:collapse}
+    thead th{font-size:13px;color:var(--muted);text-align:left;padding:10px 8px}
+    tbody td{padding:10px 8px;border-top:1px solid #f0f3f6}
+    .positive{color:green;font-weight:600}
+    .negative{color:var(--danger);font-weight:600}
+
+    /* Mobile bottom nav */
+    .bottom-nav{display:none}
+    @media (max-width:900px){.sidebar{display:none}.bottom-nav{display:flex;gap:8px;position:fixed;right:12px;left:12px;bottom:12px;background:transparent;justify-content:center}}
+    .bn-btn{background:linear-gradient(90deg,#0ea5a4,#7c3aed);border-radius:999px;padding:12px 16px;color:white;border:0;box-shadow:0 8px 22px rgba(14,165,164,0.12)}
+
+    /* Forms */
+    .form-row{display:flex;gap:10px}
+    .form-row .col{flex:1}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;background:transparent}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+
+    /* Small helpers */
+    .muted{color:var(--muted)}
+    .actions{display:flex;gap:8px}
+    .btn{padding:8px 12px;border-radius:10px;border:0;cursor:pointer}
+    .btn.primary{background:var(--accent);color:white}
+    .btn.ghost{background:transparent;border:1px solid var(--glass)}
+
+    /* Responsive tweaks for small screens */
+    @media (max-width:560px){.kpi .item{min-width:100%}.topbar{flex-direction:column;align-items:stretch;gap:8px}.brand h1{font-size:16px}}
+
+    /* Simple sparkline */
+    .sparkline{width:100%;height:48px}
+
+    /* Onboarding / empty state */
+    .empty{display:grid;place-items:center;padding:40px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">SF</div>
+        <div>
+          <h1>Sistema de Gestão Financeira</h1>
+          <div class="lead">Protótipos responsivos — Dashboard, Transações, Relatórios, Configurações</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="previewBtn">Preview (abrir em nova aba)</button>
+        <button class="btn primary" id="exportBtn">Exportar HTML</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" aria-label="Navegação principal">
+        <nav class="nav" id="mainNav">
+          <button data-screen="dashboard" class="active">🏠 Dashboard</button>
+          <button data-screen="transactions">💸 Transações</button>
+          <button data-screen="reports">📊 Relatórios</button>
+          <button data-screen="accounts">🏦 Contas</button>
+          <button data-screen="settings">⚙️ Configurações</button>
+          <small>Atalho: pressione as abas para navegar entre protótipos.</small>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="screen active" role="region" aria-label="Dashboard">
+          <div class="grid">
+            <div>
+              <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <strong>Resumo</strong>
+                  <div class="muted">Últimos 30 dias</div>
+                </div>
+                <div class="kpi">
+                  <div class="item">
+                    <h3>Saldo Atual</h3>
+                    <p style="font-size:20px;margin-top:8px">R$ 12.450,30</p>
+                  </div>
+                  <div class="item">
+                    <h3>Receitas</h3>
+                    <p style="font-size:20px;margin-top:8px" class="positive">R$ 18.900,00</p>
+                  </div>
+                  <div class="item">
+                    <h3>Despesas</h3>
+                    <p style="font-size:20px;margin-top:8px" class="negative">R$ 6.449,70</p>
+                  </div>
+                </div>
+
+                <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+                  <div style="flex:1">
+                    <div class="muted">Fluxo diário</div>
+                    <!-- tiny svg sparkline -->
+                    <svg class="sparkline" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden>
+                      <polyline fill="none" stroke="url(#g)" stroke-width="2" points="0,18 10,16 20,12 30,14 40,9 50,10 60,6 70,10 80,8 90,6 100,4"></polyline>
+                      <defs>
+                        <linearGradient id="g" x1="0" x2="1">
+                          <stop offset="0%" stop-color="#7c3aed" />
+                          <stop offset="100%" stop-color="#0ea5a4" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+                  <div style="width:160px;text-align:right">
+                    <div class="muted">Meta mensal</div>
+                    <div style="font-weight:700">R$ 20.000</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div style="margin-top:14px" class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <strong>Transações recentes</strong>
+                  <div class="muted">Últimas 10</div>
+                </div>
+                <table aria-label="Lista de transações">
+                  <thead>
+                    <tr><th>Data</th><th>Descrição</th><th>Conta</th><th>Valor</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>21/09/2025</td><td>Venda - Loja A</td><td>Conta Corrente</td><td class="positive">R$ 1.200,00</td></tr>
+                    <tr><td>20/09/2025</td><td>Compra - Supermercado</td><td>Cartão</td><td class="negative">R$ 230,50</td></tr>
+                    <tr><td>19/09/2025</td><td>Pix recebido - Cliente X</td><td>Conta Corrente</td><td class="positive">R$ 3.500,00</td></tr>
+                    <tr><td>18/09/2025</td><td>Assinatura SaaS</td><td>Conta Corrente</td><td class="negative">R$ 49,90</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <aside>
+              <div class="card" style="margin-bottom:14px">
+                <strong>Contas</strong>
+                <div style="margin-top:10px">
+                  <div style="display:flex;justify-content:space-between"><div>Conta Corrente</div><div>R$ 8.200,10</div></div>
+                  <div style="display:flex;justify-content:space-between;margin-top:6px"><div>Carteira</div><div>R$ 350,00</div></div>
+                  <div style="display:flex;justify-content:space-between;margin-top:6px"><div>Cartão</div><div class="negative">R$ -500,00</div></div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px">
+                  <button class="btn primary" onclick="openScreen('transactions')">Nova transação</button>
+                  <button class="btn ghost" onclick="openScreen('accounts')">Gerenciar</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <strong>Alertas</strong>
+                <div style="margin-top:8px" class="muted">Próximas contas a vencer</div>
+                <ul style="margin-top:8px">
+                  <li>28/09 — Luz — R$ 120,00</li>
+                  <li>30/09 — Internet — R$ 89,90</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="transactions" class="screen" role="region" aria-label="Transações">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <strong>Transações</strong>
+            <div class="actions">
+              <button class="btn ghost" onclick="showAdd()">Filtrar</button>
+              <button class="btn primary" onclick="showAdd(true)">+ Nova Transação</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+              <div style="flex:1">
+                <label>Busca</label>
+                <input placeholder="Descrição, valor, conta..." />
+              </div>
+              <div style="width:160px">
+                <label>Tipo</label>
+                <select><option>Todas</option><option>Receita</option><option>Despesa</option></select>
+              </div>
+              <div style="width:160px">
+                <label>Período</label>
+                <select><option>30 dias</option><option>Último mês</option><option>Personalizado</option></select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Conta</th><th>Valor</th></tr>
+              </thead>
+              <tbody id="txBody">
+                <!-- rows populated by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- add transaction drawer -->
+          <div id="drawer" style="display:none;position:fixed;right:12px;top:12px;bottom:12px;width:360px;background:var(--card);padding:14px;border-radius:12px;box-shadow:0 20px 60px rgba(2,6,23,0.12);overflow:auto">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <strong id="drawerTitle">Nova transação</strong>
+              <button class="btn ghost" onclick="closeDrawer()">Fechar</button>
+            </div>
+            <div>
+              <label>Tipo</label>
+              <select id="txType"><option>Receita</option><option>Despesa</option></select>
+              <div class="form-row" style="margin-top:10px">
+                <div class="col">
+                  <label>Valor</label>
+                  <input id="txValue" placeholder="0,00" />
+                </div>
+                <div class="col">
+                  <label>Data</label>
+                  <input id="txDate" type="date" />
+                </div>
+              </div>
+              <label style="margin-top:8px">Descrição</label>
+              <input id="txDesc" />
+              <label style="margin-top:8px">Conta</label>
+              <select id="txAccount"><option>Conta Corrente</option><option>Cartão</option><option>Carteira</option></select>
+              <label style="margin-top:8px">Categoria</label>
+              <input id="txCategory" placeholder="Ex: Alimentação, Venda" />
+              <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn ghost" onclick="closeDrawer()">Cancelar</button>
+                <button class="btn primary" onclick="addTx()">Salvar</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- REPORTS -->
+        <section id="reports" class="screen" role="region" aria-label="Relatórios">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <strong>Relatórios</strong>
+            <div class="muted">Exportar / Filtrar</div>
+          </div>
+
+          <div class="card" style="margin-bottom:12px">
+            <strong>Gráfico de receitas x despesas (demo)</strong>
+            <svg viewBox="0 0 300 120" style="width:100%;height:220px;margin-top:8px">
+              <rect x="0" y="60" width="300" height="60" fill="#f3f7fb"></rect>
+              <polyline fill="none" stroke="#7c3aed" stroke-width="3" points="0,80 30,70 60,50 90,40 120,56 150,48 180,30 210,36 240,22 270,18 300,12"></polyline>
+              <polyline fill="none" stroke="#0ea5a4" stroke-width="3" points="0,90 30,86 60,80 90,70 120,66 150,62 180,50 210,46 240,36 270,30 300,24"></polyline>
+            </svg>
+          </div>
+
+          <div class="card">
+            <strong>Resumo mensal</strong>
+            <div style="margin-top:10px">
+              <div style="display:flex;justify-content:space-between"><div>Setembro 2025</div><div>Saldo R$ 12.450,30</div></div>
+              <div style="margin-top:8px" class="muted">Receitas R$ 18.900 • Despesas R$ 6.449,70</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCOUNTS -->
+        <section id="accounts" class="screen" role="region" aria-label="Contas">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <strong>Contas</strong>
+            <div class="actions"><button class="btn primary">+ Nova Conta</button></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-weight:700">Conta Corrente</div>
+                <div class="muted">Itaú • Agência 0000 • Conta 00000-0</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:700">R$ 8.200,10</div>
+                <div class="muted">Disponível</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings" class="screen" role="region" aria-label="Configurações">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <strong>Configurações</strong>
+            <div class="muted">Preferências da conta e integrações</div>
+          </div>
+
+          <div class="card">
+            <label>Nome do usuário</label>
+            <input value="Otávio Silva" />
+            <div style="margin-top:10px" class="form-row">
+              <div class="col">
+                <label>Moeda</label>
+                <select><option>BRL - R$</option><option>USD</option></select>
+              </div>
+              <div class="col">
+                <label>Primeiro dia da semana</label>
+                <select><option>Segunda</option><option>Domingo</option></select>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+              <button class="btn ghost">Cancelar</button>
+              <button class="btn primary">Salvar</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Mobile floating buttons -->
+    <div class="bottom-nav" aria-hidden>
+      <button class="bn-btn" onclick="openScreen('dashboard')">🏠</button>
+      <button class="bn-btn" onclick="openScreen('transactions')">💸</button>
+      <button class="bn-btn" onclick="openScreen('reports')">📊</button>
+    </div>
+
+  </div>
+
+  <script>
+    // Simple navigation between screens (prototyping)
+    const nav = document.getElementById('mainNav');
+    const screens = document.querySelectorAll('.screen');
+    nav.addEventListener('click', (e)=>{
+      if(!e.target.dataset.screen) return;
+      openScreen(e.target.dataset.screen);
+      Array.from(nav.querySelectorAll('button')).forEach(b=>b.classList.remove('active'));
+      e.target.classList.add('active');
+    });
+
+    function openScreen(id){
+      screens.forEach(s=>s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+      // ensure drawer closed when switching
+      closeDrawer();
+    }
+
+    // Transactions demo data + drawer
+    const txBody = document.getElementById('txBody');
+    const demo = [
+      {date:'2025-09-21',desc:'Venda - Loja A',cat:'Vendas',acc:'Conta Corrente',amount:1200,type:'in'},
+      {date:'2025-09-20',desc:'Supermercado',cat:'Alimentação',acc:'Cartão',amount:230.5,type:'out'},
+      {date:'2025-09-19',desc:'Pix - Cliente X',cat:'Vendas',acc:'Conta Corrente',amount:3500,type:'in'},
+      {date:'2025-09-18',desc:'Assinatura SaaS',cat:'Serviços',acc:'Conta Corrente',amount:49.9,type:'out'}
+    ];
+
+    function renderTx(){
+      txBody.innerHTML = demo.map(t=>{
+        const val = (t.type==='in')? `<td class=\"positive\">R$ ${t.amount.toFixed(2)}</td>` : `<td class=\"negative\">R$ ${t.amount.toFixed(2)}</td>`;
+        const d = new Date(t.date).toLocaleDateString('pt-BR');
+        return `<tr><td>${d}</td><td>${t.desc}</td><td>${t.cat}</td><td>${t.acc}</td>${val}</tr>`;
+      }).join('');
+    }
+    renderTx();
+
+    const drawer = document.getElementById('drawer');
+    function showAdd(open){ drawer.style.display = 'block'; if(open) document.getElementById('txDesc').focus(); }
+    function closeDrawer(){ drawer.style.display = 'none'; }
+    function addTx(){
+      const t = {date:document.getElementById('txDate').value || new Date().toISOString().slice(0,10),desc:document.getElementById('txDesc').value || 'Sem descrição',cat:document.getElementById('txCategory').value || '-',acc:document.getElementById('txAccount').value,amount:parseFloat(document.getElementById('txValue').value)||0,type:document.getElementById('txType').value==='Receita'?'in':'out'};
+      demo.unshift(t); renderTx(); closeDrawer(); openScreen('transactions');
+    }
+
+    // Export / preview
+    document.getElementById('exportBtn').addEventListener('click', ()=>{
+      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([html],{type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'Protótipos_Sistema_Gestao_Financeira.html'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+    document.getElementById('previewBtn').addEventListener('click', ()=>{
+      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+      const w = window.open(); w.document.write(html); w.document.close();
+    });
+  </script>
+</body>
+</html>
