@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sistema de Gestão Financeira — Landing Page</title>
+  <style>
+    :root {
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #0ea5a4;
+      --accent2: #7c3aed;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial;
+      background: linear-gradient(180deg, #f0f4f8 0%, #e8f3f3 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      text-align: center;
+      padding: 60px 20px 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    header h1 { font-size: 2rem; margin-bottom: 12px; }
+    header p { font-size: 1.1rem; opacity: 0.9; }
+
+    main {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      gap: 40px;
+    }
+
+    section {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: var(--accent2);
+    }
+
+    p, li { color: var(--text); font-size: 1rem; }
+    ul { margin-top: 10px; padding-left: 20px; }
+
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      background: #0f172a;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.6rem; }
+      main { gap: 24px; }
+      section { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Sistema de Gestão Financeira</h1>
+    <p>Controle completo de finanças pessoais de forma simples, visual e automatizada</p>
+  </header>
+
+  <main>
+    <section id="problema">
+      <h2>O Problema</h2>
+      <p>Muitas pessoas enfrentam dificuldades para organizar suas finanças, acompanhar entradas e saídas de dinheiro e manter uma visão clara sobre contas a pagar e a receber. Planilhas manuais e apps genéricos são confusos e pouco eficientes.</p>
+    </section>
+
+    <section id="nicho">
+      <h2>Nicho de Pessoas</h2>
+      <p>Nosso público-alvo são <strong>pessoas físicas</strong> que desejam controlar melhor suas finanças pessoais, com foco em jovens adultos, autônomos e pequenos empreendedores que buscam praticidade e visualização clara de seus gastos.</p>
+    </section>
+
+    <section id="proposta">
+      <h2>Proposta de Valor</h2>
+      <ul>
+        <li>Controle simples e visual de entradas e saídas.</li>
+        <li>Dashboard com relatórios automáticos em tempo real.</li>
+        <li>Integração com Pix e emissão de boletos.</li>
+        <li>Alertas de contas a pagar e a receber.</li>
+        <li>Disponível em versões web e mobile.</li>
+        <li>Sistema de 'metas' para auxiliar o usuário a economizar para comprar algo que deseja</li>
+      </ul>
+    </section>
+
+    <section id="diferenciais">
+      <h2>Diferenciais Competitivos</h2>
+      <p>Nosso sistema oferece uma experiência intuitiva e acessível, com automação de tarefas financeiras e relatórios visuais que simplificam o controle do dinheiro. A integração direta com bancos digitais e o suporte multiplataforma nos diferenciam dos concorrentes tradicionais.</p>
+    </section>
+
+    <section id="equipe">
+      <h2>Integrantes da Equipe</h2>
+      <p>"Alunos: Fernando e Otávio"</p>
+      <p>"Turma: ADS11 - 2025/2"</p>
+      <p>"Professor: Ibsem Agrello Dias"</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 Sistema de Gestão Financeira — Projeto acadêmico para a disciplina de Projeto Multidisciplinar Integrador I.
+  </footer>
+
+</body>
+</html>
